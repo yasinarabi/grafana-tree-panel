@@ -1,0 +1,117 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "trlxrdZVk"
+      },
+      "gridPos": {
+        "h": 23,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "expandLevel": 1,
+        "orderLevels": "asc",
+        "rootName": "Car",
+        "serieColumn": "serieColumn",
+        "seriesCountSize": "sm",
+        "showItemCount": true,
+        "showSeriesCount": false,
+        "text": "Default value of text input option",
+        "treeFieldTemplateEngine": "simple",
+        "treeFields": "${sub1}\n${sub2}\n${sub3}"
+      },
+      "targets": [
+        {
+          "csvContent": "main,sub1,sub2,sub3\r\nCar,Body,Frame,\r\nCar,Body,Front Left Door,\r\nCar,Body,Front Right Door,\r\nCar,Body,Front Windshield,\r\nCar,Engine,Cylinder Block,\r\nCar,Engine,Pistons,\r\nCar,Engine,Crankshaft,\r\nCar,Transmission,Clutch,\r\nCar,Transmission,Gearbox,\r\nCar,Electrical System,Battery,\r\nCar,Electrical System,Alternator,\r\nCar,Electrical System,Headlights,Left Headlight\r\nCar,Electrical System,Headlights,Right Headlight\r\nCar,Suspension,Front Shock Absorbers,\r\nCar,Suspension,Rear Shock Absorbers,\r\nCar,Brakes,,\r\nCar,Interior,Driver Seat,\r\nCar,Interior,Dashboard,\r\nCar,Wheels and Tires,Front Left Tire,\r\nCar,Wheels and Tires,Front Right Tire,",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "trlxrdZVk"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "Panel Title",
+      "type": "pgillich-tree-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "trlxrdZVk"
+      },
+      "gridPos": {
+        "h": 23,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "expandLevel": 1,
+        "orderLevels": "asc",
+        "rootName": "Root",
+        "serieColumn": "serieColumn",
+        "seriesCountSize": "sm",
+        "showItemCount": true,
+        "showSeriesCount": false,
+        "text": "Default value of text input option",
+        "treeFieldTemplateEngine": "simple",
+        "treeFields": "${field_1} ${field_2}\n${field_3}"
+      },
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "db84e60d-b92a-4089-82cb-34842fb1754b"
+          },
+          "refId": "A",
+          "scenarioId": "no_data_points"
+        }
+      ],
+      "title": "Panel Title",
+      "type": "pgillich-tree-panel"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Provisioned tree dashboard",
+  "uid": "a538aeff-5a8a-42a5-901c-938d896fdd6f",
+  "version": 1,
+  "weekStart": ""
+}

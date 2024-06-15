@@ -1,8 +1,9 @@
 import React, { FC } from 'react';
 import { Field, FieldType, PanelData, PanelProps, DataFrame, GrafanaTheme2, ArrayVector } from '@grafana/data';
-import { TreeView, TreeItem } from '@material-ui/lab';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ChevronRighticon from '@material-ui/icons/ChevronRight';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { /*Field,*/ useStyles2 } from '@grafana/ui';
 import { css } from '@emotion/css';
 import Handlebars from 'handlebars';
@@ -90,7 +91,7 @@ export const TreePanel: FC<Props> = ({ options, data, width, height }) => {
 
   const loop = (item: DataItem): JSX.Element | undefined => {
     return (
-      <TreeItem className="customTreeItem" key={item.id} nodeId={item.id} label={item.text}>
+      <TreeItem className="customTreeItem" key={item.id} itemId={item.id} label={item.text}>
         {item.groups && item.groups.size !== 0
           ? orderValues(options.orderLevels)(item.groups.values()).map((child: DataItem) => {
               return loop(child);
@@ -102,15 +103,15 @@ export const TreePanel: FC<Props> = ({ options, data, width, height }) => {
 
   return (
     <div className={styles.treeBox}>
-      <TreeView
+      <SimpleTreeView
         className="customTreeView"
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRighticon />}
-        expanded={expanded}
-        onNodeToggle={handleToggle}
+        // defaultCollapseIcon={<ExpandMoreIcon />}
+        // defaultExpandIcon={<ChevronRightIcon />}
+        // expanded={expanded}
+        // onNodeToggle={handleToggle}
       >
         {loop(dataItems)}
-      </TreeView>
+      </SimpleTreeView>
     </div>
   );
 };
