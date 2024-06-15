@@ -1,16 +1,15 @@
 import React, { FC } from 'react';
-import { Field, FieldType, PanelData, PanelProps, DataFrame, GrafanaTheme2, ArrayVector } from '@grafana/data';
+import { Field, FieldType, PanelData, PanelProps, DataFrame, GrafanaTheme2 } from '@grafana/data';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { /*Field,*/ useStyles2 } from '@grafana/ui';
+import { PanelDataErrorView } from '@grafana/runtime';
+import { useStyles2 } from '@grafana/ui';
 import { css } from '@emotion/css';
 import Handlebars from 'handlebars';
 import { TreeOptions, TreeLevelOrderMode, TreeFileldTemplateEngine } from 'types';
-//import { ObjectSerializer, V1Pod } from '@kubernetes/client-node';
 import { ObjectSerializer, V1Pod } from './kubernetes_client-node/model/models';
 import { printPod } from 'printers';
+import { Button } from '@mui/material';
 
 export interface Props extends PanelProps<TreeOptions> {}
 
@@ -40,11 +39,11 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
 });
 
-export const TreePanel: FC<Props> = ({ options, data, width, height }) => {
+export const TreePanel: FC<Props> = ({ options, data, width, height, fieldConfig, id }) => {
   Handlebars.registerHelper('printPodColumn', printPodColumn);
 
   if (!data.series || data.series.length === 0) {
-    throw 'no data';
+    return <PanelDataErrorView fieldConfig={fieldConfig} panelId={id} data={data} needsStringField />;
   }
 
   const styles = useStyles2(getStyles);
@@ -84,19 +83,29 @@ export const TreePanel: FC<Props> = ({ options, data, width, height }) => {
   };
   appendToExpanded(dataItems, options.expandLevel);
 
-  const [expanded, setExpanded] = React.useState<string[]>(defaultExpanded);
-  const handleToggle = (_event: any, nodeIds: React.SetStateAction<string[]>) => {
-    setExpanded(nodeIds);
-  };
-
   const loop = (item: DataItem): JSX.Element | undefined => {
     return (
-      <TreeItem className="customTreeItem" key={item.id} itemId={item.id} label={item.text}>
+      <TreeItem
+        className="customTreeItem"
+        key={item.id}
+        itemId={item.id}
+        label={
+          <div>
+          {item.text}
+          <Button
+            size="small"
+            onClick={() => console.log("click")}
+            style={{ marginLeft: '8px' }}
+          ></Button>
+          </div>
+          }>
+      
         {item.groups && item.groups.size !== 0
           ? orderValues(options.orderLevels)(item.groups.values()).map((child: DataItem) => {
-              return loop(child);
+              return loop(child) ;
             })
           : undefined}
+      
       </TreeItem>
     );
   };
@@ -104,12 +113,7 @@ export const TreePanel: FC<Props> = ({ options, data, width, height }) => {
   return (
     <div className={styles.treeBox}>
       <SimpleTreeView
-        className="customTreeView"
-        // defaultCollapseIcon={<ExpandMoreIcon />}
-        // defaultExpandIcon={<ChevronRightIcon />}
-        // expanded={expanded}
-        // onNodeToggle={handleToggle}
-      >
+        className="customTreeView">
         {loop(dataItems)}
       </SimpleTreeView>
     </div>
@@ -144,7 +148,7 @@ function addSerieColumn(columnName: string, data: PanelData) {
     serie.fields.forEach((field) => {
       valueNum = Math.max(field.values.length, valueNum);
     });
-    let values: ArrayVector<string> = new ArrayVector<string>();
+    let values: Array<string> = new Array<string>();
     for (let i = 0; i < valueNum; i++) {
       values.add(name);
     }
@@ -185,19 +189,21 @@ function buildTreeData(options: TreeOptions, series: DataFrame[]) {
 
 function childrenByField(item: DataItem, options: TreeOptions, treeFields: string[]) {
   const treeField = treeFields[0];
-
   if (treeFields.length === 1) {
     let itemIdx = 0;
     item.rows.forEach((child) => {
       const key = evalTemplate(options.treeFieldTemplateEngine, treeField, child.values);
       const childId = item.id + idSep + correctId(key) + idSep + String(itemIdx++);
-      item.groups.set(key, {
-        id: childId,
-        text: key,
-        rows: [],
-        groups: new Map<string, DataItem>(),
-        values: child.values,
-      });
+      if (key !== "null"){
+        item.groups.set(key, {
+          id: childId,
+          text: key,
+          rows: [],
+          groups: new Map<string, DataItem>(),
+          values: child.values,
+        });
+      }
+      
     });
     item.rows = [];
 
@@ -208,24 +214,28 @@ function childrenByField(item: DataItem, options: TreeOptions, treeFields: strin
   item.rows.forEach((child) => {
     const key = evalTemplate(options.treeFieldTemplateEngine, treeField, child.values);
     const childId = item.id + idSep + correctId(key) + idSep + String(itemIdx++);
-    if (!item.groups.has(key)) {
-      item.groups.set(key, {
-        id: childId,
-        text: key,
-        rows: [],
-        groups: new Map<string, DataItem>(),
-        values: new Map<string, string>(),
-      });
+    if ( key !== "null"){
+      if (!item.groups.has(key)) {
+        item.groups.set(key, {
+          id: childId,
+          text: key,
+          rows: [],
+          groups: new Map<string, DataItem>(),
+          values: new Map<string, string>(),
+        });
+      }
+  
+      item.groups.get(key)!.rows.push(child);
     }
-
-    item.groups.get(key)!.rows.push(child);
   });
 
   item.groups.forEach((child) => {
-    if (options.showItemCount) {
-      child.text += ' (' + child.rows.length + ')';
+    if (child.text !== "null"){
+      if (options.showItemCount) {
+        child.text += ' (' + child.rows.length + ')';
+      }
+      childrenByField(child, options, treeFields.slice(1));  
     }
-    childrenByField(child, options, treeFields.slice(1));
   });
 
   item.rows = [];
